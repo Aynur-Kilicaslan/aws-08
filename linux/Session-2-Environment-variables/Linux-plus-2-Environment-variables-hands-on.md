@@ -19,6 +19,7 @@ At the end of the this hands-on training, students will be able to;
 - Part 3 - Quoting with Variables
 
 - Part 4 - Sudo Command
+# ip yi isim olarak degistirme
 # sudo hostnamectl set-hostname AYNUR (ip yerine AYNUR geldi)(sanalda)
 # bi degisken olusrtur NAME = Aynur
 # bash deyince yeni bi shell acar ve orda görunmez 
@@ -51,6 +52,7 @@ echo $CLARUS  #value
 ```bash
 export WAY=clarus #ortam degiskeni yapiyo normal degiskenleri
 env
+echo $SHLVL # hangi shellde oldugunu gösterir
 
 ```
 ​
@@ -127,10 +129,12 @@ export CLARUS=env.var
 WAY=shell.var
 cd test
 nano test1.sh
-# copy and paste the code-echo "normally we should see env. variable $CLARUS but probably we can't see the shell variable $WAY " #env.var görünür ama shell.var görünmez
+# copy and paste the code-echo "normalde env değişkeni $CLARUS'u görmemiz gerekir ancak muhtemelen $WAY shell değişkenini göremiyoruz "
+ #env.var görünür ama shell.var görünmez
 # bir script icinde degisken tanimliycaksan ve görülmesini istiyorsan env tanimlamalisin
 chmod +x test1.sh
 ./test1.sh
+ export WAY=env.var2 #bunu tanimlarsan way i de gorursun
 ```
 ​
 ## Part 3 - Quoting with Variables.
