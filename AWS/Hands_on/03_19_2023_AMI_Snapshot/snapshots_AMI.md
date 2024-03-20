@@ -2,8 +2,17 @@
 
 Purpose of the this hands-on training is to teach students how to take a snapshot of EC2 instance, create an image from EC2 instance and using Data Lifecycle Manager. 
 
-# wordpress
-# 
+# wordpress 4 bacaktan olusur 
+# operating system , apache 
+# snapshot: anlik görüntü alma yedekleme islemi.yedekleme islemlerinde kullaniyoruz.ami ile anlik yedekler alip benzer instance lar olusturuyoruz.
+# snapchat cig bir yumurta gibi dusunebiliriz.ham hali direk kullanamiyoruz bu snapshot tan bi ami olusturmamiz gerekiyor pisirip ami haline getirmemiz gerekiyor.
+# var olan snapshot tan direk volume olusturabiliriz
+# snapshot tan ami olusturup onun ilede yeni instance lar olustururuz
+# olusturulan instance in yada s3 ün snapshat i alinabilir. s3 bucket in limiti yok istedigin kadar bilgiyi atabilirsin.
+# snapshatlar s3 bucketlarda tutulur.isi biten snapshot i silebiliriz.
+# snp data lifecycle belli araliklarla instance in snapshot i aliniyor belli policy ler tanimlayip
+# sifrelenmemis bir volume i sifreleyemiyorsun ama bu volume un snapshot ini alip onu sifreleyebilirz
+
 ## Learning Outcomes
 
 - At the end of the this hands-on training, students will be able to;
@@ -55,7 +64,7 @@ Part 6 - Using Data Lifecycle Manager
   systemctl restart nginx
   systemctl enable nginx
   ```
-
+ # snapshot olusturuoz
   c. Tag: Since "Data Lifecycle Manager" work based on tags, we use tag to customize Instance!!!!!!!! 
 
   ```text
@@ -73,7 +82,7 @@ Name(manually)       : Instance-Snapshot_First
 
 - Click create snapshot.
 
-- Click snapshot `Action` menu and select `create image`
+- Click snapshot `Action` menu and select `create image` #olusan snapshot tan image olusturuyoruz
 
 ```text
 Name        : ClaruswayAMI_1
@@ -93,7 +102,7 @@ Description : ClaruswayAMI_1
 - Show that the Nginx Web Server is working.
 
 ## Part 2 - Creating an Image and Launching an Instance from the same Image with "Action Menu"
-
+# ilk olusturdugun instance dan direk image create diosun isim ver olustur snapshot secmedik ama amazon kendi alip olusturuyor
 - Go to `SampleInstance`
 
 - Click the actions menu.
@@ -101,7 +110,7 @@ Description : ClaruswayAMI_1
 - Select image >> create image.
 
 ```text
-Name        : ClaruswayAMI_2
+Name        : ClaruswayAMI_2 
 Description : ClaruswayAMI_2
 ```
 
@@ -132,8 +141,8 @@ Name : Snapshot_Second_Auto
 ## Part 3 - Creating an Image from the Snapshot of the Root Volume and Launching a new Instance
 
 - Go to EC2 menu and click snapshot section from left-hand menu.
-
-- Click `create snapshot` button.
+# 
+- Click `create snapshot` button. 
 ```text
 Select resource type : ****Volume
 Instance ID : select the root volume of the SampleInstance
