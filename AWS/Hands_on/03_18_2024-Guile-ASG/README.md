@@ -28,7 +28,7 @@ At the end of the this hands-on training, students will be able to;
 
 - Part 6 - Create Auto Scaling Policy
 
-## Part 1 - Create a Security Group
+## Part 1 - Create a Security Group #ssh http securtygroup var 
 
 - Open the Amazon EC2 console at https://console.aws.amazon.com/ec2/.
 
@@ -52,7 +52,7 @@ Tag:
 - Click `Create Security Group` button.
 
 ## Part 2 - Create Target Group
-
+# ismi ver sureyi dusur olustur
 - Go to `Target Groups` section under the Load Balancing part on left-hand menu and select `Target Group`
 
 - Click `Create Target Group` button
@@ -100,6 +100,7 @@ Tag:
 
 ## Part 3 - Create Application Load Balancer
 
+
 Go to the Load Balancing section on left-hand menu and select `Load Balancers`.
 
 - Click `Create Load Balancer` tab.
@@ -133,7 +134,7 @@ Protocol       : HTTP
 Port           : 80
 Default action : Forward to MyFirstTargetGroup
 ```
-
+# target group u sec
 - Keep rest as is
 
 - Review if everything is ok, and then click the `Create load balancer` button
@@ -158,7 +159,7 @@ Template version description    : MyTemplate_Auto_scaling
 ```
 
 - Amazon Machine Image (AMI)
-
+# quick start
 ```text
 Amazon Linux 2023 AMI (HVM), SSD Volume Type, (us-east-1)
 ```
@@ -256,6 +257,7 @@ Step 2: Choose instance launch options:
 VPC         : Default VPC
 Subnets     : Select all Subnets
 ```
+# 
 
 Step 3: Configure advanced options:
 
@@ -278,7 +280,7 @@ Additional Settings            : Keep it as default
 Step 4: Configure group size and scaling policies:
 
 - Group size
-
+# en az en fazla instance
 ```text
 Desired capacity        : 1
 Minimum capacity        : 1
@@ -300,13 +302,14 @@ Do not check
 Step 5: Add notifications:
 
 - Skip Notification
-
+# hoca tag vermeden gecti
 Step 6: Add Tags
 
 ```text
 Key     : Name
 Value:  : Autoscaling
 ```
+# load balancer DNS ini kopyala bak calisiyor mu 
 
 Step 7: Review and create Auto Scaling Group.
 
