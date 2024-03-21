@@ -32,7 +32,7 @@ def error():
 @app.route("/admin")
 def admin():
     return redirect(url_for('error'))
-
+#yukardaki sayfaya gitmek istedigimde(/admin ile) ustteki einther li yaziya yönlendirim terminalde de 302 hatasi veriyor
 
 # Create a function named greet which return formatted inline html string 
 # and assign to the dynamic route of ('/<name>')
@@ -57,7 +57,7 @@ def greet(name):
 
 # Create a function named greet_admin which redirect the request to the hello path with param of 'Master Admin!!!!' 
 # and assign to the route of ('/greet-admin')
-@app.route('/greet-admin')
+@app.route('/greet-admin') #bu sayfayi cagirinca greet.html deki yaziyi cagirdi
 def greet_admin():
     return redirect(url_for('greet', name='Master Admin!!!!'))
 
@@ -95,5 +95,5 @@ def evens():
 
 # Add a statement to run the Flask application which can be reached from any host on port 80.
 if __name__== "__main__":
-    # app.run(debug=True)
+     # app.run(debug=True)
     app.run(host='0.0.0.0', port=80)
