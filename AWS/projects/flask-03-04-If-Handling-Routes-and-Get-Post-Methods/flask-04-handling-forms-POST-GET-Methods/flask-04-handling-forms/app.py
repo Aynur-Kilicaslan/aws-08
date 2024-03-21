@@ -8,7 +8,7 @@ app = Flask(__name__)
 # Create welcome page with main.html file and assign it to the root path
 @app.route('/')
 def home():
-    return render_template('main.html', name='oktay')
+    return render_template('main.html', name='aynur') #bu sayfada yazan seyi getircek
 
 # Write a function named `greet` which uses template file named `greet.html` given under 
 # `templates` folder. it takes parameters from query string on URL, assign that parameter 
@@ -19,8 +19,8 @@ def greet():
    if 'user' in request.args: 
         usr = request.args['user']
         return render_template('greet.html', user=usr)
-   else:
-        return render_template('greet.html', user='Send your user name with "greet?user=xxxxx" param in query string')
+   else: #sadece greet ile cagirirsak usersiz bu yazi doner (greet?user=aynur) boyle cagir
+        return render_template('greet.html', user='Send your user name with "greet?user=xxxxx" param in query string') #guery string modunda cagirmamiz lazim user degiskeni kullanarak
 
 # Write a function named `login` which uses `GET` and `POST` methods, 
 # and template files named `login.html` and `secure.html` given under `templates` folder 
@@ -31,13 +31,13 @@ def login():
         user_name = request.form['username']
         password = request.form['password']
         if password == 'clarusway':
-            return render_template('secure.html', user=user_name.title())
+            return render_template('secure.html', user=user_name.title()) #parola dogru ise bu secure.html sayfasi calisir
         else:
-            return render_template('login.html', user=user_name.title(), control = True)
+            return render_template('login.html', user=user_name.title(), control = True) #password yanlis ise bu calisir login sayfasi,sifren yanlis diycek
     else:
-        return render_template('login.html', control = False)
+        return render_template('login.html', control = False) #eger girdiler yapilmadiysa,post metodu uygulamadiysak bu blok calisir.uygulamanin kendisini goruruz
 
 # Add a statement to run the Flask application which can be reached from any host on port 80.
 if __name__ == '__main__':
-    # app.run(debug=True)
-    app.run(host='0.0.0.0', port=80)
+     #app.run(debug=True)
+     app.run(host='0.0.0.0', port=80)
