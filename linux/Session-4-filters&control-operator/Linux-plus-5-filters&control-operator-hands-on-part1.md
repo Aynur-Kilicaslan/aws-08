@@ -22,11 +22,25 @@ At the end of the this hands-on training, students will be able to;
 - Part 2 - Using Control Operators
 ​
 ## Part 1 - Using Filters
-​#
+# cat
+# tee
+# grep 
+# cut
+# tr
+# wc
+# sort
+# uniq
+# comm
+# sed
+# awk
+
 # filtrelemede en cok kullanilan isaret "|"
 # filtreleme: su filtrelemesi gibi suyun icindeki baska seyleri tutup suyu salmasi gibi
 # cat colors.txt | grep "blue"     #icinde renkler olan dosyadan sadece maviyi aldik 
+
+
 **cat**
+
 - concatenate files and print on the standard output
 ​
 - Create a folder and name it filters.
