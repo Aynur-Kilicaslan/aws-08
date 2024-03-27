@@ -205,7 +205,7 @@ $2 for the second field.
 $n for the nth field.
 
 ```bash
-awk '{print $2}' awk.txt # 
+awk '{print $2}' awk.txt # 2.sütunlari getirdi
 ```
 
 **Output:**
@@ -260,7 +260,7 @@ awk -F: '{print $2}' awk.txt #ayraci burda F le gösterioz, : dan ayir ve 2. sü
 - We can use awk command as filter. 
 
 ```bash
-ls -l | awk '{print $9}'
+ls -l | awk '{print $9}' # bosluga göre ayirip 9. sütunu getirir
 ```
 
 **Output:**
