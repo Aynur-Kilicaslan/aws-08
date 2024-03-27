@@ -28,16 +28,16 @@ At the end of the this hands-on training, students will be able to;
 - Part 3 - Creating S3 Bucket with Versioning
 
 
-## Part 1 - S3 Bucket Basic Operations
+## Part 1 - S3 Bucket Basic Operations (properts yok)
 
 - Open S3 Service from AWS Management Console.
 
 - Create a bucket with following properties, 
-
+# bazen instance larin da ulasmasi gerekir bucketa,mimari nerdeyse kullanicilar nerdeyse o Region i secersin 
 ```text
 Bucket name                 : myfirstbucket-YOUR_NAME_HERE-01(students use their own clarusway student name number)
 Region                      : N.Virginia
-Object Ownership            : ACLs enabled - Bucket owner preferred *(Since we'll show "make public" feature we activate it.)
+Object Ownership            : ACLs enabled - Bucket owner preferred *(Since we'll show "make public" feature we activate it.) # access control listi sec,
 Block all public access     : Checked (KEEP BlOCKED)
 Versioning                  : Disabled
 Tagging                     : 0 Tags
@@ -57,7 +57,7 @@ Object-level logging        : Disabled
   - Availability.
 
 - Upload `index.html` and `cat.jpg`files to the bucket with default values.
-
+# yükledigin objeyi ac https adresini kopyala bak acilmiyor
 - Show the file details.
 
 - Open the file URL in the browser and show that it is not accessible.
@@ -67,7 +67,8 @@ Object-level logging        : Disabled
 - Open the bucket permissions, change it to public.
 
 ```
-PERMISSIONS >> BLOCK PUBLIC ACCESS>>>> EDIT>>> UNCHECKED 
+PERMISSIONS >> BLOCK PUBLIC ACCESS>>>> EDIT>>> UNCHECKED # on u off yap,genel erisim engelini kaldirdik
+# objeyi acip sag ustten object aksiyondan Make Public using ACL sec onayla dene acildi public oldu
 ```
 - Select the file uploaded and make it "Public Also."
 
@@ -79,9 +80,9 @@ PERMISSIONS >> BLOCK PUBLIC ACCESS>>>> EDIT>>> UNCHECKED
 
 - Open the file URL in the browser and show that it is "Not Accessible."
 
-- Select the "cat1" and from action menu show how to use "Presign URL"
+- Select the "cat1" and from action menu show how to use "Presign URL" # share with a pres url onayla (cp presigned url de ustten) kontrol et 5 dk icin herkese acildi bucketi public yapmadan istedigimiz kisilere link ile acma dosyamizi belli bir sure icin,
 
-- Select the file uploaded and make it "Public Also".
+- Select the file uploaded and make it "Public Also". # bunu yapmadi 
 
 - Open the file URL in the browser, show it is accessible now.
 
@@ -145,10 +146,10 @@ PROPERTIES>>>>> STATIC WEBSITE HOSTING
 
 - Copy endpoint and show that the website is Not Accessible.
 
--  Change the bucket Public Access status from CHECKED(BLOCKED) to UNCHECKED(PUBLIC).
+-  Change the bucket Public Access status from CHECKED(BLOCKED) to UNCHECKED(PUBLIC). # kontrol ettik acilmadi 
 
 ```
-PERMISSIONS >> BLOCK PUBLIC ACCESS>>>> EDIT>>> UNCHECKED 
+PERMISSIONS >> BLOCK PUBLIC ACCESS>>>> EDIT>>> UNCHECKED # bunu off yapmaliyiz ki public olsun,ama hala acilmiyor policy lazim
 ```
 - Set the static website bucket policy as shown below (PERMISSIONS >> BUCKET POLICY) and change `bucket-name`  with your own bucket.
 
@@ -156,20 +157,20 @@ PERMISSIONS >> BLOCK PUBLIC ACCESS>>>> EDIT>>> UNCHECKED
 
 ```
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::don't forget to change me/*"
-        }
-    ]
+    "Version": "2012-10-17", 
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::don't forget to change me/*"
+        }
+    ]
 }
 ```
 
-- Open static website URL in browser and show its working.
+- Open static website URL in browser and show its working. # kontrol et acildigini gör
 
 - Create folder called `kitten` under the bucket named `pet.clarusway.static.web.hosting`.
 
@@ -178,7 +179,7 @@ PERMISSIONS >> BLOCK PUBLIC ACCESS>>>> EDIT>>> UNCHECKED
 - Open static website URL in browser again, show it's not working at with default URL and facing with `404 Not Found`
 
 - Add path `kitten` to the end of URL to show the content without file name.
-
+# simdi acilmiycak link cunku uzanti degisti, linkin sonuna /kitten ekle acilacak
 ```text
 http://.......amazonaws.com/kitten/
 ```
@@ -187,7 +188,7 @@ http://.......amazonaws.com/kitten/
 
 - Open static website URL in browser again with path `kitten` added, show it's not working as with default `index.html`, facing with `404 Not Found`
 
-- Go to properties >> static web hosting and change the index.html to cutest.html.
+- Go to properties >> static web hosting and change the index.html to cutest.html. #burda ne yaziyorsa onun ismini yazmalisin 
 
 ```text
 index.html ---> cutest.html
@@ -232,16 +233,16 @@ PROPERTIES>>>>> STATIC WEBSITE HOSTING
 
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::don't forget to change me/*"
-        }
-    ]
+    "Version": "2012-10-17", 
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::don't forget to change me/*"
+        }
+    ]
 }
 ```
 
