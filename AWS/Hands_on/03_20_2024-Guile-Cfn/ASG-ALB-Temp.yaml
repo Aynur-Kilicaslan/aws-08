@@ -1,33 +1,33 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
-  This temp creates an ASG behind an ALB.
-
+  This temp creates an ASG behind an ALB. 
+# kullanici stack ayaga kalkarken bazi seyleri degistirmk isteyebilir,buradaki herseyi yazildigi gibi kullanmak istemeyebilir,hangi instance hangi keypair sececeksin,bazi parametreleri degistirmek icin var burasi
 Parameters:
-  VPCParameter:
-    Description: Select VPC.
+  VPCParameter: #vpc ler networkle ilgili ayarlari iceriyor ilerde görecegiz 
+    Description: Select VPC. #kullaniciya vpc sectirmek icin bunu olusturduk
     Type: AWS::EC2::VPC::Id
-
-  SubnetParameter:
-    Description: Select at least 2 subnets.
+  
+  SubnetParameter: #subnet yazip parameter-type-subnet-list i sececegiz,1 den fazla subnt sececegim icin,yoksa list olmayani secerdik
+    Description: Select at least 2 subnets. #Loadbalancer en az 2 AZ sectiriyordu bize bizde 2 tane sec dedik
     Type: List<AWS::EC2::Subnet::Id>
 
-  InstanceTypeParameter:
-    Description: Select instance type.
+  InstanceTypeParameter: #doc dan bakip yazdi
+    Description: Select instance type. #instance in tipini sec
     Type: String
     Default: t2.micro
-    AllowedValues:
+    AllowedValues: #bununla secenekleri kisitladik,bu ücünden birinden secebilir kullanici ayaga kaldirirken sistemi 
       - t2.micro
       - t3.micro
       - t2.nano
 
-  KeyPairParameter:
+  KeyPairParameter: #keypair yazinca asagi gelen parameter-type-keypair i secersen kullanirken sectirecek 
     Description: Select key pair.
     Type: AWS::EC2::KeyPair::KeyName
-
-Mappings:
+#biz mapping tanimlamasa idik,farkli Region larda gelip imageid yi degistirmek gerekecekti
+Mappings: #bir degere birseyler atiyor,
   RegionImageMap:
     us-east-1:
-      AMI: ami-0d7a109bf30624c99
+      AMI: ami-0d7a109bf30624c99 # bunu ec2 da N.virginia nin imageid sini aldi istersek ilgi duydugumuz Region larin idlerini alip asagidakileri guncelleyebiliriz
     us-east-2:
       AMI: ami-0103f211a154d64a6
     us-west-1:
@@ -37,8 +37,8 @@ Mappings:
     eu-west-1:
       AMI: ami-058b1b7fe545997ae
 
-Resources:
-  myALB:
+Resources: 
+  myALB: #applicationloadbalancer
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       SecurityGroups:
@@ -46,13 +46,13 @@ Resources:
       Subnets: !Ref SubnetParameter 
       Type: application
 
-  myListener:
+  myListener: # bu ayri bir resourch olarak geciyor load balancer in altinda degil
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions: # Required
-        - Type: forward
-          TargetGroupArn: !Ref myTG
-      LoadBalancerArn: !Ref myALB # Required
+        - Type: forward #gelen trafigi target grupa forward ediyor
+          TargetGroupArn: !Ref myTG #ref ile bagladik target grupa
+      LoadBalancerArn: !Ref myALB # Required myALB nin lestener i.
       Port: 80
       Protocol: HTTP 
 
@@ -63,36 +63,37 @@ Resources:
       HealthCheckGracePeriod: 90
       HealthCheckType: ELB
       LaunchTemplate:
-        LaunchTemplateId: !Ref myLT
+        LaunchTemplateId: !Ref myLT #olusturdugumuz launch temp'a atadik
         Version: "1"
       MaxSize: "3" # Required
       MinSize: "1" # Required
-      TargetGroupARNs:
+      TargetGroupARNs: #hangi target groupta olusturayim instance lari diyor,asagida sectik
         - !Ref myTG
-      VPCZoneIdentifier: !Ref SubnetParameter
+      VPCZoneIdentifier: !Ref SubnetParameter #yukarda az sectik 
 
   myCPUPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
-      AutoScalingGroupName: !Ref myASG  # Required
+      AutoScalingGroupName: !Ref myASG  # Required Hangi ASG un policy si oldugunu sectik
       PolicyType: TargetTrackingScaling
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 60.0
+        TargetValue: 60.0 # %60 CPU tutacak sekilde ayarlayacak
 
-  myLT:
+  myLT: #Launchtemplate yazip ec2-launchtemplate sec
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
-        ImageId: !FindInMap
-          - RegionImageMap
-          - !Ref 'AWS::Region'
+        ImageId: !FindInMap # imageId yi Map te bul demis oluyorz
+          - RegionImageMap #hangi map oldugunu dedik,bu mapte bulcak,ama ordaki hangi degeri dönecek?
+          - !Ref 'AWS::Region' #AWS hangi Region da ise onu bul ve sec demis oluyoruz.
           - AMI
-        InstanceType: !Ref InstanceTypeParameter
-        KeyName: !Ref KeyPairParameter
-        SecurityGroupIds:
-          - !GetAtt mySG.GroupId
+        InstanceType: !Ref InstanceTypeParameter # yukardaki parametrer da kullanici buna ne secerse gelip buraya atanacak ref sayesinde,buraya baglamis olduk
+        KeyName: !Ref KeyPairParameter #kullanicinin sectigi keypair i atar
+        SecurityGroupIds: # eger vpc si default olamayan vpcler kullanacaksak secrt.groupID kullanmalisin,doc dan bakti.ilerde vpc yi kendimiz olusturacagiz
+          - !GetAtt mySG.GroupId #groupId de ref yerine FnGetAtt kullaniliyor, git benim secr grubunun groupid sini al demis olduk
+          # Base64, metni ASCII karakter seti dışındaki karakterler içerebilecek durumlarda sorun olamamsi icin kullanilir.Farkli kullanim sekilleri var, dokumandan bakabilirsin ama !Base yazinca cikiyor secebilirsin. bunun sayesinde asagidaki userdatayi encode edip yazabildik
         UserData: !Base64 |
           #! /bin/bash
           yum update -y
@@ -117,37 +118,37 @@ Resources:
           systemctl start httpd
           systemctl enable httpd
 
-  myTG:
+  myTG: #target group u olusturuyoruz,target yazip ElasticLoadBalancingV2 yi secti,applicationLoadBAlancer icin V2 eger Clasik load balancer kullansaydik V1 i sececektik,dokumanlardan bakip anlayabilirsin hangisini kullanman gerektigini
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      HealthCheckIntervalSeconds: 10
-      HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 5
+      HealthCheckIntervalSeconds: 10 #   10 sn de bir check yap diyor
+      HealthCheckTimeoutSeconds: 5 # 5 sn cevap gelmezse hata vermis Healtcheck olarak kabul etkabul et
+      HealthyThresholdCount: 5 #5 tanesi arka arkaya duzgun calisiyorsu saglikli kabul et
       Port: 80
       Protocol: HTTP
-      UnhealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2 #2 tane arka arkaya hata verirse sagliksiz kabul et
       VpcId: !Ref VPCParameter
-
-  mySG:
+#önce burdan basladi,siralama önemli degil,ayri ayri tüm gruplari olusturup sonra iliskilendirmeniz önemli
+  mySG: #securty yazip asagidan ec2-securitygroup u secti,mantikli bi isim verdi. burasi onemli hem bize baktigimizda fikir verecek,hemde iliskilendirme yaptigimizda bu secrt. groupu git ASG lardaki instance larda kullan dedigimizde bu LogicalID yi kullaniyor. Stack olustururken bu LogicalID ye bir physicalID karsilik geliyor 
     Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allows SSH and HTTP # Required
-      SecurityGroupIngress: 
-        - IpProtocol: tcp
+    Properties: #özellikleri,buradaki herseyi kullanmasakta o kendi default degeri atiyor bazilarini kullanip degistirdi,ihtiyacin olmayani degistirmeye gerek yok
+      GroupDescription: Allows SSH and HTTP # Required (zorunlu) SSH a ve HTTP ye izin verir 
+      SecurityGroupIngress: #inbound kurallarini giriyoruz,security-group-ingrres-cidr blogunu secti ,Engres i> outbound kurllari default olarak acikti,onu sildi
+        - IpProtocol: tcp #array oldugu icin - koyduk basina
           FromPort: 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0
+          CidrIp: 0.0.0.0/0 #tüm dünyadan buna baglanilabilsin
         - IpProtocol: tcp
-          FromPort: 80
+          FromPort: 80 #web sitemizi host edebilmek icin bu portuda actik
           ToPort: 80
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPCParameter
-
+#stack olustuktan sonra loadbalancer a gidip dns adresini kopyalayip bakmak yerine aws bize direk cikti olarak görmek istedigimiz seyleri verecek burasi sayesinde
 Outputs:
   LoadBalancerDNSName:
-    Description: The DNSName of the application load balancer.
-    Value: !Join
-      - ''
-      - - 'http://'
-        - !GetAtt myALB.DNSName
+    Description: The DNSName of the application load balancer. #load balancer in dnsname ini al
+    Value: !Join #asagidaki iki ifadeyi birbirine bagliyoruz,bosluk koymadan 
+      - '' #delimiter
+      - - 'http://' #buraya asagidan gelecek adresi yazmis olacak
+        - !GetAtt myALB.DNSName #git benim ALB imin dnsname ini al
      
