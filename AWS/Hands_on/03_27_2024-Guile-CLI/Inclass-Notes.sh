@@ -1,16 +1,17 @@
-# AWS CLI
+# AWS CLI (Command Line Interface)
 # Guile - 03_27_2024
-
+# Cfn(cloudformation) bir aws servisi cli ise bir arayüz,ikiside IaC(infractracter?) ikiside yazilan templartei ayaga kaldiriyor,cli cfn kadar özellikli degil birseyleri otomatik ayarliyordu cfn. 
+# bazi komutlarla aws e ulastiriyor bizi konsol a gitmeden
 # References
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
-# https://awscli.amazonaws.com/v2/documentation/api/latest/index.html
+# https://awscli.amazonaws.com/v2/documentation/api/latest/index.html aws in kullanacagimiz komutlari burada,nasil yaziliyor neye göre kullaniliyor vs
 # https://docs.aws.amazon.com/linux/al2023/ug/get-started.html
 # https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters-ami.html
 # https://aws.amazon.com/blogs/compute/query-for-the-latest-amazon-linux-ami-ids-using-aws-systems-manager-parameter-store/
 
 
 
-# Installation
+# Installation cli kurulumlari farkli 
 
 # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
@@ -31,6 +32,10 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip  #install "unzip" if not installed
 sudo ./aws/install
 
+##notlarim
+# homun altinda .aws e gir iki dosya var credentials in icinde access key ler bilgiler var
+
+#eger uzaktan baska bilgisayarlardan girersen hesabina configrasyin yaparsan o bilgisayaardaki credent.. dosyasina kayit oluyor sifreniz ayyrilirken silin bu dosyalari
 
 # Configuration
 
@@ -39,9 +44,9 @@ aws configure
 cat .aws/config
 cat .aws/credentials
 
-aws configure --profile user1
+aws configure --profile user1 # hangi profili kullanmak istiyorsan bu sekilde yapabilirsin
 
-export AWS_PROFILE=user1
+export AWS_PROFILE=user1 # her seferinde degistirmekle ugrasmak yerine bu sekilde o profile gecis yapabilirsin,o oturum boyunca bunun credenti.. larini kullanir
 export AWS_PROFILE=default
 
 aws configure list-profiles
@@ -55,22 +60,25 @@ aws iam create-user --user-name aws-cli-user
 
 aws iam delete-user --user-name aws-cli-user
 
+#cli s3 ile cok kullanilir iam ile falan cok kullanilmiyor
 
-# S3
+# S3 
 aws s3 ls
+aws s3 help
 
 aws s3 mb s3://guile-cli-bucket
 
 aws s3 cp in-class.yaml s3://guile-cli-bucket
 
-aws s3 ls s3://guile-cli-bucket
+aws s3 ls s3://guile-cli-bucket #listeliyor
 
-aws s3 rm s3://guile-cli-bucket/in-class.yaml
+aws s3 rm s3://guile-cli-bucket/in-class.yaml #bu buckettan bi ibje siler
 
-aws s3 rb s3://guile-cli-bucket
-
+aws s3 rb s3://guile-cli-bucket # bucket in ici doluyken consoldada silmiyordu empty ile bosaltiyorduk burdada hata verir dolu ise
+aws s3 rb s3://guile-cli-bucket --force #bu sekilde bosaltip siler
 
 # EC2
+# eger actigin ec2 ya confgrsyn yapmadanda role atarsan credential vs olmadanda calisir cli komutlari daha guvenli olur bu sekilde 
 aws ec2 describe-instances
 
 aws ec2 run-instances \

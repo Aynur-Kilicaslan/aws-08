@@ -16,7 +16,7 @@ sudo apt update
 sudo apt-get install mariadb-client -y
 
 # Connect the clarusdb on MariaDB Server on the other EC2 instance (pw:clarus1234).
-mysql -h ec2-3-94-163-77.compute-1.amazonaws.com -u clarususer -p
+mysql -h ec2-3-94-163-77.compute-1.amazonaws.com -u clarususer -p # ec2 yerine database in dns adresini al sifre gir baglan
 
 # Show that clarususer can do same db operations on MariaDB Server instance.
 SHOW DATABASES;
@@ -26,8 +26,10 @@ SELECT * FROM employees;
 SELECT * FROM offices;
 SELECT first_name, last_name, salary, city, state FROM employees INNER JOIN offices ON employees.office_id=offices.office_id WHERE employees.salary > 100000;
 
+
 # Close the mysql terminal.
 EXIT;
+mysql -h ec2-3-94-163-77.compute-1.amazonaws.com -u root -p #bunu deneyince access denied verdi cünkü root kullanicisi uzaktan baglanamasin ayari yapmistik
 
 # DO NOT FORGET TO TERMINATE THE INSTANCES YOU CREATED!!!!!!!!!!
 

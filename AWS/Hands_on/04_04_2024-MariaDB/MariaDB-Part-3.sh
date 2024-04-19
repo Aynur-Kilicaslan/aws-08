@@ -1,4 +1,4 @@
-# Part 3 - Manipulating MariaDB Database
+# Part 3 - Manipulating MariaDB Database bu partin amaci bilgiler yukleyip onlara ulasabiuliyor muyuz görcez
 
 # Login back as clarususer using the password defined.
 mysql -u clarususer -p

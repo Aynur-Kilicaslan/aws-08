@@ -1,33 +1,36 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
   This temp creates an ASG behind an ALB. 
-# kullanici stack ayaga kalkarken bazi seyleri degistirmk isteyebilir,buradaki herseyi yazildigi gibi kullanmak istemeyebilir,hangi instance hangi keypair sececeksin,bazi parametreleri degistirmek icin var burasi
-Parameters:
-  VPCParameter: #vpc ler networkle ilgili ayarlari iceriyor ilerde görecegiz 
+# kullanici stack ayaga kalkarken bazi seyleri degistirmk isteyebilir,buradaki herseyi yazildigi gibi kullanmak istemeyebilir,hangi instance hangi keypair sececeksin,bazi parametreleri degistirmek icin var burasi,ref fon ile burayi kullanacagiz
+Parameters: # 4- asagi in patameter yaz parameter i sec doc dan doldur,önce instance type doldur,sonra git ref ver burayi
+
+  VPCParameter: #9 vpc yaz parameter-type-vpc-idlist sec.  vpc ler networkle ilgili ayarlari iceriyor ilerde görecegiz 
     Description: Select VPC. #kullaniciya vpc sectirmek icin bunu olusturduk
-    Type: AWS::EC2::VPC::Id
+    Type: AWS::EC2::VPC::Id #simdi asagi git SG TG vps ref ver
   
-  SubnetParameter: #subnet yazip parameter-type-subnet-list i sececegiz,1 den fazla subnt sececegim icin,yoksa list olmayani secerdik
+  SubnetParameter: # 8- subnet yazip parameter-type-subnet-list i sececegiz,1 den fazla subnt sececegim icin,yoksa list olmayani secerdik
     Description: Select at least 2 subnets. #Loadbalancer en az 2 AZ sectiriyordu bize bizde 2 tane sec dedik
     Type: List<AWS::EC2::Subnet::Id>
+    #ASG ve ALB de ekledik ref olarak
 
-  InstanceTypeParameter: #doc dan bakip yazdi
+  InstanceTypeParameter: # parameter doc dan bakip yazdi.ilk gelen yaml
     Description: Select instance type. #instance in tipini sec
     Type: String
     Default: t2.micro
-    AllowedValues: #bununla secenekleri kisitladik,bu ücünden birinden secebilir kullanici ayaga kaldirirken sistemi 
+    AllowedValues: #doc dakiler büyüktü biz bununla secenekleri kisitladik,bu ücünden birinden secebilir kullanici ayaga kaldirirken sistemi 
       - t2.micro
       - t3.micro
       - t2.nano
 
-  KeyPairParameter: #keypair yazinca asagi gelen parameter-type-keypair i secersen kullanirken sectirecek 
+  KeyPairParameter: #keypair yazinca asagi gelen parameter-type-keypair i secersen kullanirken sectirecek ec2 keypairi direk kullanilacak key pair icin var
     Description: Select key pair.
     Type: AWS::EC2::KeyPair::KeyName
-#biz mapping tanimlamasa idik,farkli Region larda gelip imageid yi degistirmek gerekecekti
+    
+# 6- biz mapping tanimlamasa idik,farkli Region larda gelip imageid yi degistirmek gerekecekti
 Mappings: #bir degere birseyler atiyor,
-  RegionImageMap:
+  RegionImageMap: #nasil kullanildigina mapping doc den fn::FindInMap i tikla,alttaki uzun örnegin alt kismini aldi
     us-east-1:
-      AMI: ami-0d7a109bf30624c99 # bunu ec2 da N.virginia nin imageid sini aldi istersek ilgi duydugumuz Region larin idlerini alip asagidakileri guncelleyebiliriz
+      AMI: ami-0d7a109bf30624c99 # bunu ec2 da N.virginia nin imageid sini aldi istersek ilgi duydugumuz Region larin id lerini alip asagidakileri guncelleyebiliriz
     us-east-2:
       AMI: ami-0103f211a154d64a6
     us-west-1:
@@ -38,12 +41,12 @@ Mappings: #bir degere birseyler atiyor,
       AMI: ami-058b1b7fe545997ae
 
 Resources: 
-  myALB: #applicationloadbalancer
+  myALB: # 7- applicationloadbalancer alttaki 4 ünü yap sonra vpc ye gec
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       SecurityGroups:
         - !GetAtt mySG.GroupId
-      Subnets: !Ref SubnetParameter 
+      Subnets: !Ref SubnetParameter  #bunlari olustur sonra subnet ekle parameter a
       Type: application
 
   myListener: # bu ayri bir resourch olarak geciyor load balancer in altinda degil
@@ -61,13 +64,13 @@ Resources:
     Properties:
       DesiredCapacity: "2"
       HealthCheckGracePeriod: 90
-      HealthCheckType: ELB
+      HealthCheckType: ELB #bunu consoldada kapatamiyorduk  load balancra dahil ediyorduk
       LaunchTemplate:
-        LaunchTemplateId: !Ref myLT #olusturdugumuz launch temp'a atadik
+        LaunchTemplateId: !Ref myLT #olusturdugumuz launch temp'a atadik,instance lari buraya göre kaldiracak
         Version: "1"
       MaxSize: "3" # Required
       MinSize: "1" # Required
-      TargetGroupARNs: #hangi target groupta olusturayim instance lari diyor,asagida sectik
+      TargetGroupARNs: #hangi target groupta olusturayim instance lari diyor,asagida sectik bunun icine olusturacak inst
         - !Ref myTG
       VPCZoneIdentifier: !Ref SubnetParameter #yukarda az sectik 
 
@@ -75,25 +78,33 @@ Resources:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       AutoScalingGroupName: !Ref myASG  # Required Hangi ASG un policy si oldugunu sectik
-      PolicyType: TargetTrackingScaling
+      PolicyType: TargetTrackingScaling # biz derste sample olani secmistik,min mak kapasite vermistik bu daha kolaymis bunu secti
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
-          PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 60.0 # %60 CPU tutacak sekilde ayarlayacak
+          PredefinedMetricType: ASGAverageCPUUtilization #matrigi sectik
+        TargetValue: 60.0 # %60 CPU tutacak sekilde ayarlayacak ona göre ekleyip kaldiracak
 
-  myLT: #Launchtemplate yazip ec2-launchtemplate sec
+ #3- Launchtemplate yazip ec2-launchtemplate sec,iki secr group var vpc meselesinden dolayi ID li olan kaldi,image, inst type i,key name i  sonradan doldur,user dataya gec önce 
+  myLT: 
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
-        ImageId: !FindInMap # imageId yi Map te bul demis oluyorz
+      #amazon linux 2023 olarak ayaga kalkmasini saglamak icin imageid kaldi
+      #>>>5- ben hangi Region da isem oranin imagid sini kullanmam gerek,awse bulundugum Region in image id sini kullan demek icin mapping kullanacagiz
+        ImageId: !FindInMap
           - RegionImageMap #hangi map oldugunu dedik,bu mapte bulcak,ama ordaki hangi degeri dönecek?
           - !Ref 'AWS::Region' #AWS hangi Region da ise onu bul ve sec demis oluyoruz.
           - AMI
+          #birsürü instance type var git bak  myLT den doc a git LAunchtemplateData yi ac,orda birsürü instance var ben her zaman ayni instance secmek istemeyebilirim,test icin yada kucuk seyler icin yada büyük öyellikli vs  bu yüzden tercihi kullaniciya birakmak icin parameter atayacagim, parameter a git
         InstanceType: !Ref InstanceTypeParameter # yukardaki parametrer da kullanici buna ne secerse gelip buraya atanacak ref sayesinde,buraya baglamis olduk
+        #yukari parameter tanimlayinca !Ref deyince tanimlanan parameter i veriyor secmen icin,yinede AWS Cloudformation altinda Template reference altinda intrinsic function a gidip Ref in nasil yazildigina bakabilirsin
         KeyName: !Ref KeyPairParameter #kullanicinin sectigi keypair i atar
         SecurityGroupIds: # eger vpc si default olamayan vpcler kullanacaksak secrt.groupID kullanmalisin,doc dan bakti.ilerde vpc yi kendimiz olusturacagiz
-          - !GetAtt mySG.GroupId #groupId de ref yerine FnGetAtt kullaniliyor, git benim secr grubunun groupid sini al demis olduk
-          # Base64, metni ASCII karakter seti dışındaki karakterler içerebilecek durumlarda sorun olamamsi icin kullanilir.Farkli kullanim sekilleri var, dokumandan bakabilirsin ama !Base yazinca cikiyor secebilirsin. bunun sayesinde asagidaki userdatayi encode edip yazabildik
+          - !GetAtt mySG.GroupId #groupId de ref yerine FnGetAtt kullaniliyor, git benim secr grubunun groupid sini al demis olduk,grupid bu sekilde yazildigini doc den gördü
+
+          #LT doc dan LAunchtemplateData yi ac hepsinin doc ü orda user dataya bakabilirsin
+          # Base64, metni ASCII karakter seti dışındaki karakterler içerebilecek durumlarda sorun olamamsi icin kullanilir.Farkli kullanim sekilleri var,  >>> !Base yazinca cikiyor secebilirsin. bunun sayesinde asagidaki userdatayi encode edip yazabildik(>>> hocanin kodunu yapistir buraya biraz icerden)
+          #doc dan bakmak icin AWS Cloudformation altinda Template reference altinda intrinsic function ac Fn::Base64 u sec 
         UserData: !Base64 |
           #! /bin/bash
           yum update -y
@@ -117,7 +128,7 @@ Resources:
           </html>" > /var/www/html/index.html
           systemctl start httpd
           systemctl enable httpd
-
+# 2- isim ver,ip adresleri,tag attribut,kullanmadiklarini sil
   myTG: #target group u olusturuyoruz,target yazip ElasticLoadBalancingV2 yi secti,applicationLoadBAlancer icin V2 eger Clasik load balancer kullansaydik V1 i sececektik,dokumanlardan bakip anlayabilirsin hangisini kullanman gerektigini
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -128,12 +139,14 @@ Resources:
       Protocol: HTTP
       UnhealthyThresholdCount: 2 #2 tane arka arkaya hata verirse sagliksiz kabul et
       VpcId: !Ref VPCParameter
-#önce burdan basladi,siralama önemli degil,ayri ayri tüm gruplari olusturup sonra iliskilendirmeniz önemli
-  mySG: #securty yazip asagidan ec2-securitygroup u secti,mantikli bi isim verdi. burasi onemli hem bize baktigimizda fikir verecek,hemde iliskilendirme yaptigimizda bu secrt. groupu git ASG lardaki instance larda kullan dedigimizde bu LogicalID yi kullaniyor. Stack olustururken bu LogicalID ye bir physicalID karsilik geliyor 
-    Type: AWS::EC2::SecurityGroup
+# 1- önce burdan basladi,siralama önemli degil,ayri ayri tüm gruplari olusturup sonra iliskilendirmeniz önemli
+#isim ver,group name sil,engres i ve tag i sil doldur digerlerini,dokumana sonradan bakti
+
+  mySG: #>>>securty yazip asagidan ec2-securitygroup u secti,mantikli bi isim verdi. burasi onemli hem bize baktigimizda fikir verecek,hemde iliskilendirme yaptigimizda bu secrt. groupu  ASG lardaki instance larda kullan dedigimizde bu LogicalID yi kullaniyor. Stack olustururken bu LogicalID ye bir physicalID karsilik geliyor 
+    Type: AWS::EC2::SecurityGroup 
     Properties: #özellikleri,buradaki herseyi kullanmasakta o kendi default degeri atiyor bazilarini kullanip degistirdi,ihtiyacin olmayani degistirmeye gerek yok
       GroupDescription: Allows SSH and HTTP # Required (zorunlu) SSH a ve HTTP ye izin verir 
-      SecurityGroupIngress: #inbound kurallarini giriyoruz,security-group-ingrres-cidr blogunu secti ,Engres i> outbound kurllari default olarak acikti,onu sildi
+      SecurityGroupIngress: #inbound kurallarini(aga gelen trafigi kontrol eder) giriyoruz,>>> security-group-ingrres-cidr blogunu secti ,Engres > outbound kurllari default olarak acikti,onu sildi
         - IpProtocol: tcp #array oldugu icin - koyduk basina
           FromPort: 22
           ToPort: 22
@@ -142,13 +155,14 @@ Resources:
           FromPort: 80 #web sitemizi host edebilmek icin bu portuda actik
           ToPort: 80
           CidrIp: 0.0.0.0/0
-      VpcId: !Ref VPCParameter
-#stack olustuktan sonra loadbalancer a gidip dns adresini kopyalayip bakmak yerine aws bize direk cikti olarak görmek istedigimiz seyleri verecek burasi sayesinde
+      VpcId: !Ref VPCParameter #bunu sonradan ac,az leri subnetleri secmek icin bunu ayarliycaz ref vercez
+
+#10- stack olustuktan sonra loadbalancer a gidip dns adresini kopyalayip bakmak yerine aws bize direk cikti olarak görmek istedigimiz seyleri verecek burasi sayesinde
 Outputs:
   LoadBalancerDNSName:
     Description: The DNSName of the application load balancer. #load balancer in dnsname ini al
-    Value: !Join #asagidaki iki ifadeyi birbirine bagliyoruz,bosluk koymadan 
-      - '' #delimiter
+    Value: !Join #asagidaki iki ifadeyi birbirine bagliyoruz,bosluk koymadan git dnsten gelen adresi http ile yaz (fn lerden buldu)
+      - '' #delimiter(ayrac)
       - - 'http://' #buraya asagidan gelecek adresi yazmis olacak
-        - !GetAtt myALB.DNSName #git benim ALB imin dnsname ini al
+        - !GetAtt myALB.DNSName #git benim ALB imin dnsname ini al doc ten bakti getatt kullanildigini gördü en son gitti description yazdi
      
