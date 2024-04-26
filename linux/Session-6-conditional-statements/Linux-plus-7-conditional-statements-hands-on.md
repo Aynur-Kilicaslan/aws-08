@@ -84,7 +84,7 @@ chmod +x if-statement.sh
 | =    | equal            |
 | !=   | not equal        |
 | -z   | Empty string     | #bossa
-| -n   | Not empty string | #doluysa
+| -n   | Not empty string | #bos degil
 
 - Let's see this. Create a file and name it `string-operators.sh`
 
@@ -173,7 +173,7 @@ then
   echo "file is > 0 bytes"
 fi
 
-if [[ -x $0 ]]
+if [[ -x $0 ]]  #?
 then
   echo "$0 is an executable file "
 fi

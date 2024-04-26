@@ -170,7 +170,7 @@ chmod +x variable.sh && ./variable.sh
 - Command substitution empowers us to take the output of a command or program (which would usually be written on the screen) and save it as the value of a variable. To do this we put it inside brackets, followed by a $ symbol.
 
 ```bash
-content=$(ls)
+content=$(ls) # dolar parantezinin icindekini calistir gel bu degiskene ata diyoruz
 echo $content
 ```
 
@@ -227,7 +227,7 @@ echo "Welcome $NAME"
 - When writing interactive bash scripts, we can use the read command to get the user input. To specify a prompt string, use the -p option. The prompt is printed before the read is executed and doesn’t include a newline.
 
 ```bash
-read -p "Enter your name: " NAME
+read -p "Enter your name: " NAME #promta aktarmak icin p koyyoz
 echo "Welcome $NAME"
 ```
 
@@ -237,8 +237,8 @@ echo "Welcome $NAME"
 read -p "Enter your name: " NAME
 echo "Welcome $NAME"
 
-read -s -p "Enter your password: " PASSWORD
-echo -e "\nYour password is $PASSWORD"
+read -s -p "Enter your password: " PASSWORD #s ile gizliyorsun yazarken görülmüyor,s i p den önce yazmalisin hata veriyor yoksa 
+echo -e "\nYour password is $PASSWORD" #echo icinde \n bunun gibi karakterlerin calismasi icin e lazim
 ```
 
 ### Command Line Arguments
@@ -249,15 +249,19 @@ echo -e "\nYour password is $PASSWORD"
 
 ```bash
 #!/bin/bash
-echo "File Name is $0"
+{}
+echo "File Name is $0" #calistirdigin scriptin adini verir
 echo "First Parameter is $1"
 echo "Second Parameter is $2"
 echo "Third Parameter is $3"
-echo "All the Parameters are $@"
-echo "Total Number of Parameters : $#"
-echo "$RANDOM is a random number"
-echo "The current line number is $LINENO"
+echo "All the Parameters are $@" #verilen tum parametreleri
+echo "Total Number of Parameters : $#" #verilen parametrelerin sayisini 
+echo "$RANDOM is a random number" #random sayi uretir
+echo "The current line number is $LINENO" #script icinde kac satir var 
+$$ #calisan scriptin process id sini gösterir 
+$? # önceki komut duzgun calismis mi gösterir,0 sa dogru
 ```
+
 
 - Make the script executable. 
 
@@ -268,7 +272,7 @@ chmod +x argument.sh
 - Execute it with following command.
 
 ```bash
-./argument.sh Joe Matt Timothy James Guile
+./argument.sh Joe Matt Timothy James Guile # bu sekilde calistirinca degiskenleri vermis oluyoruz
 ```
 
 ### Arrays
@@ -292,14 +296,14 @@ DISTROS[4]="alpine"
 ```bash
 devops_tools=("docker" "kubernetes" "ansible" "terraform" "jenkins")
 ```
-
+echo $devops_tools[4]
 #### Working with arrays
 
 - We can access a value in an array by using the following method.
 
 ```bash
-echo ${DISTROS[0]}
-echo ${DISTROS[1]}
+echo ${DISTROS[0]} #0.eleman gelir
+echo ${DISTROS[1]} #1.eleman
 ```
 
 - We can access all elements by putting `@` instead of number.
@@ -311,7 +315,7 @@ echo ${DISTROS[@]}
 - With the following method, we can learn number of elements.
 
 ```bash
-echo ${#DISTROS[@]}
+echo ${#DISTROS[@]} #git dstrodaki tüm elemanlarin sayisini getir.
 ```
 
 ## Part 3 - Simple Arithmetic
@@ -334,7 +338,7 @@ expr 7 % 2
 
 ```bash
 expr "3 + 5"
-expr 3-2
+expr 3-2 #her rakam ve operator arasinda bosluk olmali yapmiyor islem yoksa
 ```
 
 - Let's create a simple calculator. Create a file and name it `calculator.sh`.
@@ -358,7 +362,8 @@ echo "DIV="`expr $first_number / $second_number`
 
 > How can we do with Command Line Arguments?
 
-### let
+### let #expr ile ayni isi yapiyor ama calisma mantigi farkli
+#
 
 - `let` is a builtin function of Bash that helps us to do simple arithmetic. It is similar to `expr` except instead of printing the answer it saves the result to a variable. Unlike expr we need to enclose the expression in quotes. 
 
