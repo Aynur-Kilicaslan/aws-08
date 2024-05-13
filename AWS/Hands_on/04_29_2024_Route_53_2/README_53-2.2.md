@@ -175,7 +175,7 @@ Sec Group: RDP---->0.0.0.0/0
 
 - Configure Health Check
 
-```bash 
+```bash #sadece ip ver gec 
 1. Name: firsthealthcheck
 
 What to monitor     : Endpoint
@@ -283,7 +283,7 @@ Record ID               : Failover Scenario-secondary
 
 
 ## Part 3 - Creating a Geolocation routing policies
-
+#eski recordlari sil
 ### STEP 1 :Create Geolocation record for Japan
 
 - Click create record
